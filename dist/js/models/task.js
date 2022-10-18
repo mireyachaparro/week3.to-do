@@ -1,5 +1,11 @@
 export class Task {
-    constructor(id = this.createId()) { this.isCompleted; false; }
+    constructor(title, responsible) {
+        this.title = title;
+        this.responsible = responsible;
+        this.id = Task.createId();
+        this.isCompleted;
+        false;
+    }
     static createId() {
         return Math.round(Math.random() * 1000000); //para que no tenga comas
     }
