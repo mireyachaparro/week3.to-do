@@ -4,26 +4,26 @@ export class Component {
     //es un contenedor con los metodos commpartidos con los hijos
     render(selector, template) {
         //pinta dentro
-        const element = document.querySelector(this.selector); //dondé lo voy a pintar
+        const element = document.querySelector(selector); //dondé lo voy a pintar
         if (element === null)
             return; //si es null, que no haga nada
-        element.innerHTML = this.template; //qué voy a pintar
+        element.innerHTML = template; //qué voy a pintar
         return true;
     }
     renderAdd(selector, template) {
         //pinta dentro
-        const element = document.querySelector(this.selector); //dondé lo voy a pintar
+        const element = document.querySelector(selector); //dondé lo voy a pintar
         if (element === null)
             return; //si es null, que no haga nada.
-        element.innerHTML += this.template; //qué voy a pintar
+        element.innerHTML += template; //qué voy a pintar
         return true;
     }
     renderOuter(selector, template) {
         //pinta encima
-        const element = document.querySelector(this.selector); //dondé lo voy a pintar
+        const element = document.querySelector(selector); //dondé lo voy a pintar
         if (element === null)
             return; //si es null, que no haga nada
-        element.outerHTML = this.template; //qué voy a pintar
+        element.outerHTML = template; //qué voy a pintar
         return true;
     }
 }
