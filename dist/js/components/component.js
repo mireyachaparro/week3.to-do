@@ -4,9 +4,11 @@ export class Component {
     //es un contenedor con los metodos commpartidos con los hijos
     render(selector, template) {
         //pinta dentro
+        if (!selector)
+            return false;
         const element = document.querySelector(selector); //dondé lo voy a pintar
         if (element === null)
-            return; //si es null, que no haga nada
+            return false; //si es null, que no haga nada
         element.innerHTML = template; //qué voy a pintar
         return true;
     }

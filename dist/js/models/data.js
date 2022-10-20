@@ -5,3 +5,4 @@ export const tasks = [
     new Task('dormir', 'pepe'),
     new Task('ir al parque', 'elena'),
 ];
+tasks[0].isCompleted = true;

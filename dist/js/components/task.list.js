@@ -1,51 +1,55 @@
 import { tasks } from '../models/data.js';
 import { Task } from '../models/task.js';
+import { Store } from '../Services/storage.js';
 import { AddTask } from './add.task.js';
 import { Component } from './component.js';
+import { ItemTask } from './item-task.js';
 export class TaskList extends Component {
     constructor(selector) {
         super();
         this.selector = selector;
-        this.tasks = [...tasks];
+        this.storeService = new Store('Task'); //lo instanciamos y le damos el tipo task
+        if (this.storeService.getStore().length === 0) {
+            this.tasks = [...tasks];
+            this.storeService.setStore(this.tasks);
+        }
+        else {
+            this.tasks = this.storeService.getStore();
+        }
         this.manageComponent();
     }
     manageComponent() {
         this.template = this.createTemplate();
         this.render(this.selector, this.template);
-        new AddTask('slot#add-task');
-        setTimeout(() => {
-            var _a;
-            (_a = document
-                .querySelector('form')) === null || _a === void 0 ? void 0 : _a.addEventListener('submit', this.handleAdd.bind(this)); //cuanndo una callback empieza por this, termina por .bind(this)
-            //document.querySelectorAll('.eraser'); //devuelve todas las papeleras, una lista, las listas no tienen eventlistener pero tienen foreach
-            document
-                .querySelectorAll('.eraser')
-                .forEach((item) => item.addEventListener('click', this.handleEraser.bind(this)));
-        }, 100);
+        new AddTask('slot#add-task', this.handleAdd.bind(this));
     }
     createTemplate() {
         let template = `<section>
-        <h2>Tareas</h2>
-        <slot id="add-task"></slot>
-        <ul>`;
+                <h2>Tareas</h2>
+                <slot id="add-task"></slot>
+                <ul>`;
         this.tasks.forEach((item) => {
-            template += `<li>${item.id} - ${item.title} - ${item.responsible}<span class ="eraser" data-id="${item.id}">🗑️</span></li>`;
+            template += new ItemTask('', item, this.handlerEraser.bind(this), this.handlerComplete.bind(this)).template;
         });
         template += `</ul>
-        </section>`;
+            </section>`;
         return template;
     }
     handleAdd(ev) {
-        ev.preventDefault();
+        // ev.preventDefault();
         const title = document.querySelector('#title')
             .value;
-        const responsible = document.querySelector('#responsible').value;
+        const responsible = document.querySelector('#resp').value;
         this.tasks.push(new Task(title, responsible));
         this.manageComponent();
     }
-    handleEraser(ev) {
-        const deleteId = ev.target.dataset.id;
-        this.tasks = this.tasks.filter((item) => item.id != +deleteId);
+    handlerEraser(deletedID) {
+        this.tasks = this.tasks.filter((item) => item.id !== deletedID);
         this.manageComponent();
+    }
+    handlerComplete(completedID) {
+        const i = this.tasks.findIndex((item) => item.id === completedID);
+        this.tasks[i].isCompleted = !this.tasks[i].isCompleted;
+        console.log(this.tasks);
     }
 }

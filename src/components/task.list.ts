@@ -1,64 +1,69 @@
 import { tasks } from '../models/data.js';
 import { Task } from '../models/task.js';
+import { Store } from '../Services/storage.js';
 import { AddTask } from './add.task.js';
 import { Component } from './component.js';
+import { ItemTask } from './item-task.js';
 
 export class TaskList extends Component {
     template!: string; //! le indica que no va a ser null
-    tasks = [...tasks];
+    tasks: Array<Task>;
+    storeService: Store<Task>;
     constructor(public selector: string) {
         super();
+        this.storeService = new Store('Task'); //lo instanciamos y le damos el tipo task
+
+        if (this.storeService.getStore().length === 0) {
+            this.tasks = [...tasks];
+            this.storeService.setStore(this.tasks);
+        } else {
+            this.tasks = this.storeService.getStore();
+        }
         this.manageComponent();
     }
 
     manageComponent() {
         this.template = this.createTemplate();
         this.render(this.selector, this.template);
-        new AddTask('slot#add-task');
-        setTimeout(() => {
-            document
-                .querySelector('form')
-                ?.addEventListener('submit', this.handleAdd.bind(this)); //cuanndo una callback empieza por this, termina por .bind(this)
-
-            //document.querySelectorAll('.eraser'); //devuelve todas las papeleras, una lista, las listas no tienen eventlistener pero tienen foreach
-            document
-                .querySelectorAll('.eraser')
-                .forEach((item) =>
-                    item.addEventListener('click', this.handleEraser.bind(this))
-                );
-        }, 100);
+        new AddTask('slot#add-task', this.handleAdd.bind(this));
     }
 
     createTemplate() {
         let template = `<section>
-        <h2>Tareas</h2>
-        <slot id="add-task"></slot>
-        <ul>`;
-
+                <h2>Tareas</h2>
+                <slot id="add-task"></slot>
+                <ul>`;
         this.tasks.forEach((item: Task) => {
-            template += `<li>${item.id} - ${item.title} - ${item.responsible}<span class ="eraser" data-id="${item.id}">🗑️</span></li>`;
+            template += new ItemTask(
+                '',
+                item,
+                this.handlerEraser.bind(this),
+                this.handlerComplete.bind(this)
+            ).template;
         });
-
         template += `</ul>
-        </section>`;
+            </section>`;
         return template;
     }
     handleAdd(ev: Event) {
-        ev.preventDefault();
+        // ev.preventDefault();
         const title = (document.querySelector('#title') as HTMLInputElement)
             .value;
         const responsible = (
-            document.querySelector('#responsible') as HTMLInputElement
+            document.querySelector('#resp') as HTMLInputElement
         ).value;
         this.tasks.push(new Task(title, responsible));
         this.manageComponent();
     }
 
-    handleEraser(ev: Event) {
-        const deleteId = (ev.target as HTMLElement).dataset.id;
-        this.tasks = this.tasks.filter(
-            (item) => item.id != +(deleteId as string)
-        );
+    handlerEraser(deletedID: number) {
+        this.tasks = this.tasks.filter((item) => item.id !== deletedID);
         this.manageComponent();
+    }
+
+    handlerComplete(completedID: number) {
+        const i = this.tasks.findIndex((item) => item.id === completedID);
+        this.tasks[i].isCompleted = !this.tasks[i].isCompleted;
+        console.log(this.tasks);
     }
 }

@@ -1,12 +1,24 @@
 import { Component } from './component.js';
 export class AddTask extends Component {
-    constructor(selector) {
+    constructor(selector, handle) {
+        //funcion void
         //cuando se instanciamos le decimos el selector.
         //pasar selector al padre
         super();
         this.selector = selector;
+        this.handle = handle;
         this.template = this.createTemplate(); //construyo el template
         this.renderOuter(this.selector, this.template); //lo renderizo
+        setTimeout(() => {
+            var _a;
+            (_a = document
+                .querySelector('form')) === null || _a === void 0 ? void 0 : _a.addEventListener('submit', (ev) => {
+                ev.preventDefault();
+                console.log('tengo q añadir');
+                handle(ev);
+            });
+        }, 100);
+        //cuanndo una callback empieza por this, termina por .bind(this)
     }
     //crear metodo template
     createTemplate() {

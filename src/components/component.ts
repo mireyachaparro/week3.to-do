@@ -4,8 +4,9 @@ export abstract class Component {
     //es un contenedor con los metodos commpartidos con los hijos
     render(selector: string, template: string) {
         //pinta dentro
+        if (!selector) return false;
         const element = document.querySelector(selector); //dondé lo voy a pintar
-        if (element === null) return; //si es null, que no haga nada
+        if (element === null) return false; //si es null, que no haga nada
         element.innerHTML = template; //qué voy a pintar
         return true;
     }
@@ -23,4 +24,10 @@ export abstract class Component {
         element.outerHTML = template; //qué voy a pintar
         return true;
     }
+}
+
+export interface IComponent {
+    //esto no se debe guardar aqui!!!!!!
+    createTemplate: () => string;
+    manageComponent: () => void;
 }

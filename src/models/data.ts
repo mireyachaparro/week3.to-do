@@ -6,3 +6,5 @@ export const tasks: Array<Task> = [
     new Task('dormir', 'pepe'),
     new Task('ir al parque', 'elena'),
 ];
+
+tasks[0].isCompleted = true;
